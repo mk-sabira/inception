@@ -55,19 +55,8 @@ services:
       - wp-volume:/var/www
 
 volumes:
-  wp-volume:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ${PWD}/data/wordpress
-
   db-volume:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ${PWD}/data/mariadb
+  wp-volume:
 
 
 networks:
