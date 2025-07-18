@@ -1,39 +1,4 @@
-#version: '3'
 
-#services:
-#  nginx:
- #   build:
-  #    context: .
-   #   dockerfile: requirements/nginx/Dockerfile
-    #container_name: nginx
-    #depends_on:
-     # - wordpress
-    #ports:
-     # - "443:443"
-    #volumes:
-     # - ./requirements/nginx/conf/:/etc/nginx/http.d/
-     # - ./requirements/nginx/tools:/etc/nginx/ssl/
-     # - /home/bmakhama/simple_docker_nginx_html/public/html:/var/www/
-    #restart: always
-  #mariadb:
-   # build:
-    #  context: .
-     # dockerfile: requirements/mariadb/Dockerfile
-     # args:
-      #  DB_NAME: ${DB_NAME}
-       # DB_USER: ${DB_USER}
-       # DB_PASS: ${DB_PASS}
-       # DB_ROOT: ${DB_ROOT}
-    #container_name: mariadb
-    #ports:
-     # - "3306:3306"
-    #volumes:
-     # - db-volume:/var/lib/mysql
-    #restart: always
-
-
-#volumes:
- # db-volume:
 version: '3'
 
 services:
@@ -49,9 +14,9 @@ services:
     networks:
       - inception
     volumes:
-      - ./requirements/nginx/conf/:/etc/nginx/http.d/
-      - ./requirements/nginx/tools:/etc/nginx/ssl/
-      - wp-volume:/var/www/
+      - ./requirements/nginx/conf/:/etc/nginx/http.d
+      - ./requirements/nginx/tools:/etc/nginx/ssl
+      - wp-volume:/var/www
     restart: always
 
   mariadb:
@@ -87,20 +52,23 @@ services:
     networks:
       - inception
     volumes:
-      - wp-volume:/var/www/
+      - wp-volume:/var/www
 
 volumes:
   wp-volume:
+    driver: local
     driver_opts:
-      o: bind
       type: none
-      device: /home/${USER}/data/wordpress
+      o: bind
+      device: ${PWD}/data/wordpress
 
   db-volume:
+    driver: local
     driver_opts:
-      o: bind
       type: none
-      device: /home/${USER}/data/mariadb
+      o: bind
+      device: ${PWD}/data/mariadb
+
 
 networks:
     inception:
