@@ -6,15 +6,15 @@ services:
       context: .
       dockerfile: requirements/nginx/Dockerfile
     container_name: nginx
-    depends_on:
-      - wordpress
-    ports:
-      - "443:443"
-    networks:
-      - inception
-    volumes:
-      - wp-volume:/var/www
-    restart: on-failure
+  depends_on:
+    - wordpress
+  ports:
+    - "443:443"
+  networks:
+    - inception
+  volumes:
+    - wp-volume:/var/www
+  restart: on-failure
 
   mariadb:
     build:
@@ -25,12 +25,12 @@ services:
           DB_USER: ${DB_USER}
           DB_PASS: ${DB_PASS}
           DB_ROOT: ${DB_ROOT}
-      container_name: mariadb
-      networks:
+    container_name: mariadb
+    networks:
       - inception
-      volumes:
+    volumes:
       - db-volume:/var/lib/mysql
-      restart: on-failure
+    restart: on-failure
 
   wordpress:
     build:
@@ -47,14 +47,14 @@ services:
           WPUSER1PASS: ${WPUSER1PASS}
       env_file:
         - .env
-      container_name: wordpress
-      depends_on:
-        - mariadb
-      restart: on-failure
-      networks:
-        - inception
-      volumes:
-        - wp-volume:/var/www/
+    container_name: wordpress
+    depends_on:
+      - mariadb
+    restart: on-failure
+    networks:
+      - inception
+    volumes:
+      - wp-volume:/var/www/
 volumes:
   wp-volume:
       driver_opts:
