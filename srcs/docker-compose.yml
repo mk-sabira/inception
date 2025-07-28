@@ -1,72 +1,109 @@
 version: '3'
 
 services:
-  nginx:
+# Nginx service
+nginx:
+    # Build the Docker image from the Nginx Dockerfile in requirements/nginx/
+    image: nginx
     build:
-      context: .
-      dockerfile: requirements/nginx/Dockerfile
-  container_name: nginx
-  depends_on:
-    - wordpress
-  ports:
-    - "443:443"
-  networks:
-    - inception
-  volumes:
-    - wp-volume:/var/www
-  restart: on-failure
-
-  mariadb:
-    build:
-      context: .
-      dockerfile: requirements/mariadb/Dockerfile
-      args:
-          DB_NAME: ${DB_NAME}
-          DB_USER: ${DB_USER}
-          DB_PASS: ${DB_PASS}
-          DB_ROOT: ${DB_ROOT}
-    container_name: mariadb
-    networks:
-      - inception
-    volumes:
-      - db-volume:/var/lib/mysql
-    restart: on-failure
-
-  wordpress:
-    build:
-      context: .
-      dockerfile: requirements/wordpress/Dockerfile
-      args:
-          DB_NAME: ${DB_NAME}
-          DB_USER: ${DB_USER}
-          DB_PASS: ${DB_PASS}
-          DOMAIN_NAME: ${DOMAIN_NAME}
-          WPADUSER: ${WPADUSER}
-          WPUSER1: ${WPUSER1}
-          WPADPASS: ${WPADPASS}
-          WPUSER1PASS: ${WPUSER1PASS}
-      env_file:
-        - .env
-    container_name: wordpress
+    context: .
+    dockerfile: requirements/nginx/Dockerfile
+    # Set a container name
+    container_name: nginx
+    # Depend on the WordPress service being up and running
     depends_on:
-      - mariadb
-    restart: on-failure
+    - wordpress
+    # Publish port 443 on the host to port 443 in the container
+    ports:
+    - "443:443"
+    # Attach to the inception network
     networks:
-      - inception
+    - inception
+    # Mount local directories as volumes in the container
     volumes:
-      - wp-volume:/var/www/
+    - wp-volume:/var/www/
+    # Always restart the container if it stops
+    restart: on-failure
+
+# MariaDB service
+mariadb:
+    # Build the Docker image from the MariaDB Dockerfile in requirements/mariadb/
+    image: mariadb
+    build:
+    context: .
+    dockerfile: requirements/mariadb/Dockerfile
+    args:
+        # Pass arguments for the database name, username, password, and root password
+        DB_NAME: ${DB_NAME}
+        DB_USER: ${DB_USER}
+        DB_PASS: ${DB_PASS}
+        DB_ROOT: ${DB_ROOT}
+    # Set a container name
+    container_name: mariadb
+    # Attach to the inception network
+    networks:
+    - inception
+    volumes:
+    - db-volume:/var/lib/mysql
+    # Always restart the container if it stops
+    restart: on-failure
+
+# WordPress service
+wordpress:
+    # Build the Docker image from the WordPress Dockerfile in requirements/wordpress/
+    image: wordpress
+    env_file:
+    - .env
+    build:
+    context: .
+    dockerfile: requirements/wordpress/Dockerfile
+    args:
+        # Pass arguments for the database name, username, and password
+        DB_NAME: ${DB_NAME}
+        DB_USER: ${DB_USER}
+        DB_PASS: ${DB_PASS}
+        DOMAIN_NAME: ${DOMAIN_NAME}
+        WPADUSER: ${WPADUSER}
+        WPUSER1: ${WPUSER1}
+        WPADPASS: ${WPADPASS}
+        WPUSER1PASS: ${WPUSER1PASS}
+    # Set a container name
+    container_name: wordpress
+    # Depend on the MariaDB service being up and running
+    depends_on:
+    - mariadb
+    # Always restart the container if it stops
+    restart: on-failure
+    # Attach to the inception network
+    networks:
+    - inception
+    # Mount the wp-volume volume in the container
+    volumes:
+    - wp-volume:/var/www/
+
+# Define Docker volumes
 volumes:
-  wp-volume:
-      driver_opts:
-      o: bind
-      type: none
-      device: /home/${USER}/data/wordpress
-  db-volume:
-      driver_opts:
-      o: bind
-      type: none
-      device: /home/${USER}/data/mariadb
-  portainer_data:
-  networks:
-    inception:
-      driver: bridge
+# wp-volume volume for WordPress files
+wp-volume:
+    # Set driver options for the volume
+    driver_opts:
+    o: bind
+    type: none
+    device: /home/${USER}/data/wordpress
+
+# db-volume volume for MariaDB files
+db-volume:
+    # Set driver options for the volume
+    driver_opts:
+    o: bind
+    type: none
+    device: /home/${USER}/data/mariadb
+
+portainer_data:  # Added volume for Portainer data persistence
+
+# Define Docker networks
+networks:
+# inception bridge network
+inception:
+    # Set the network driver to bridge
+    driver: bridge
