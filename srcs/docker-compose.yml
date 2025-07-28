@@ -39,23 +39,23 @@ services:
     # Build the Docker image from the MariaDB Dockerfile in requirements/mariadb/
     image: mariadb
     build:
-    context: .
-    dockerfile: requirements/mariadb/Dockerfile
-    args:
-        # Pass arguments for the database name, username, password, and root password
-        DB_NAME: ${DB_NAME}
-        DB_USER: ${DB_USER}
-        DB_PASS: ${DB_PASS}
-        DB_ROOT: ${DB_ROOT}
+      context: .
+      dockerfile: requirements/mariadb/Dockerfile
+      args:
+          # Pass arguments for the database name, username, password, and root password
+          DB_NAME: ${DB_NAME}
+          DB_USER: ${DB_USER}
+          DB_PASS: ${DB_PASS}
+          DB_ROOT: ${DB_ROOT}
     # Set a container name
-    container_name: mariadb
+      container_name: mariadb
     # Attach to the inception network
-    networks:
+      networks:
       - inception
-    volumes:
+      volumes:
       - db-volume:/var/lib/mysql
     # Always restart the container if it stops
-    restart: on-failure
+      restart: on-failure
 
   wordpress:
     # build:
@@ -74,35 +74,35 @@ services:
     # volumes:
     #   - wp-volume:/var/www
       # Build the Docker image from the WordPress Dockerfile in requirements/wordpress/
-    image: wordpress
-    env_file:
-      - .env
+    # image: wordpress
     build:
-    context: .
-    dockerfile: requirements/wordpress/Dockerfile
-    args:
-        # Pass arguments for the database name, username, and password
-        DB_NAME: ${DB_NAME}
-        DB_USER: ${DB_USER}
-        DB_PASS: ${DB_PASS}
-        DOMAIN_NAME: ${DOMAIN_NAME}
-        WPADUSER: ${WPADUSER}
-        WPUSER1: ${WPUSER1}
-        WPADPASS: ${WPADPASS}
-        WPUSER1PASS: ${WPUSER1PASS}
-    # Set a container name
-    container_name: wordpress
+      context: .
+      dockerfile: requirements/wordpress/Dockerfile
+      args:
+          # Pass arguments for the database name, username, and password
+          DB_NAME: ${DB_NAME}
+          DB_USER: ${DB_USER}
+          DB_PASS: ${DB_PASS}
+          DOMAIN_NAME: ${DOMAIN_NAME}
+          WPADUSER: ${WPADUSER}
+          WPUSER1: ${WPUSER1}
+          WPADPASS: ${WPADPASS}
+          WPUSER1PASS: ${WPUSER1PASS}
+      env_file:
+        - .env
+      # Set a container name
+      container_name: wordpress
     # Depend on the MariaDB service being up and running
-    depends_on:
-      - mariadb
+      depends_on:
+        - mariadb
     # Always restart the container if it stops
-    restart: on-failure
+      restart: on-failure
     # Attach to the inception network
-    networks:
-      - inception
+      networks:
+        - inception
     # Mount the wp-volume volume in the container
-    volumes:
-      - wp-volume:/var/www/
+      volumes:
+        - wp-volume:/var/www/
 
 volumes:
   wp-volume:
@@ -115,8 +115,6 @@ volumes:
       o: bind
       type: none
       device: /home/bmakhama/data/mariadb
-
-
 # Define Docker volumes
 volumes:
   # wp-volume volume for WordPress files
@@ -126,7 +124,6 @@ volumes:
       o: bind
       type: none
       device: /home/${USER}/data/wordpress
-  
   # db-volume volume for MariaDB files
   db-volume:
       # Set driver options for the volume
@@ -134,13 +131,13 @@ volumes:
       o: bind
       type: none
       device: /home/${USER}/data/mariadb
-  
+
   portainer_data:  # Added volume for Portainer data persistence
   
   # Define Docker networks
   networks:
   # inception bridge network
-  inception:
+    inception:
       # Set the network driver to bridge
       driver: bridge
   
