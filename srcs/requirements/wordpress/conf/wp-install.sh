@@ -1,9 +1,18 @@
 #!/bin/sh
-# Wait for MariaDB to be ready
-until mysqladmin ping -h mariadb --silent; do
+# Wait for MariaDB with mysqladmin and timeout
+set -e
+for i in {1..30}; do
+    if mysqladmin -h mariadb -u "${DB_USER}" -p"${DB_PASS}" ping --silent; then
+        break
+    fi
     echo "Waiting for MariaDB..."
     sleep 2
 done
+
+if ! mysqladmin -h mariadb -u "${DB_USER}" -p"${DB_PASS}" ping --silent; then
+    echo "Error: MariaDB not available after 60 seconds"
+    exit 1
+fi
 
 # Install WordPress if not already installed
 if ! wp core is-installed --path=/var/www --allow-root; then
@@ -16,3 +25,5 @@ if ! wp core is-installed --path=/var/www --allow-root; then
         --path=/var/www \
         --allow-root
 fi
+
+exec /usr/sbin/php-fpm82 -F

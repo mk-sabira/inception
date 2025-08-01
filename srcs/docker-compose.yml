@@ -13,7 +13,6 @@ services:
     networks:
       - inception
     volumes:
-      - ./requirements/nginx/conf/:/etc/nginx/http.d/
       - ./requirements/nginx/tools:/etc/nginx/ssl/
       - wp-volume:/var/www/
     restart: always
@@ -28,12 +27,15 @@ services:
         DB_PASS: ${DB_PASS}
         DB_ROOT: ${DB_ROOT}
     container_name: mariadb
-    ports:
-      - "3306:3306"
     networks:
       - inception
     volumes:
       - db-volume:/var/lib/mysql
+    environment:
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
+      - DB_ROOT=${DB_ROOT}
     restart: always
 
   wordpress:
@@ -47,25 +49,35 @@ services:
     container_name: wordpress
     depends_on:
       - mariadb
-    restart: always
     networks:
       - inception
     volumes:
       - wp-volume:/var/www/
+    environment:
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
+      - DOMAIN_NAME=${DOMAIN_NAME}
+      - WP_ADMIN_USER=${WP_ADMIN_USER}
+      - WP_ADMIN_PASS=${WP_ADMIN_PASS}
+      - WP_ADMIN_EMAIL=${WP_ADMIN_EMAIL}
+      - WP_TITLE=${WP_TITLE}
+      - WP_TABLE_PREFIX=${WP_TABLE_PREFIX}
+    restart: always
 
 volumes:
   wp-volume:
     driver_opts:
       o: bind
       type: none
-      device: /home/${USER}/data/wordpress
+      device: ${WP_VOLUME_PATH}
 
   db-volume:
-    driver_opts: 
+    driver_opts:
       o: bind
       type: none
-      device: /home/${USER}/data/mariadb
+      device: ${DB_VOLUME_PATH}
 
 networks:
-    inception:
-        driver: bridge
+  inception:
+    driver: bridge

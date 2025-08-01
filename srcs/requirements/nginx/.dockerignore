@@ -1,2 +1,2 @@
-.git
-.env
+
+.git *.md *.txt secrets/
