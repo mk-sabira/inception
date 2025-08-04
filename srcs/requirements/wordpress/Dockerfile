@@ -50,17 +50,13 @@ RUN wget https://wordpress.org/latest.zip && \
     rm -rf wordpress latest.zip && \
     chown -R nobody:nogroup /var/www
 
-# COPY requirements/wordpress/conf/wp-config-create.sh /usr/local/bin/wp-config-create.sh
-# COPY requirements/wordpress/conf/wp-install.sh /usr/local/bin/wp-install.sh
-
-# RUN chmod +x /wp-config-create.sh /wp-install.sh
-
-# # Run setup and PHP-FPM at runtime
-# CMD ["sh", "-c", "/usr/local/bin/wp-config-create.sh && chmod -R 0777 /var/www/wp-content && /usr/local/bin/wp-install.sh"]
-
+# Copy configuration and setup scripts
 COPY requirements/wordpress/conf/wp-config-create.sh /usr/local/bin/wp-config-create.sh
 COPY requirements/wordpress/conf/wp-install.sh /usr/local/bin/wp-install.sh
 
-RUN chmod +x /usr/local/bin/wp-config-create.sh /usr/local/bin/wp-install.sh
+# Verify scripts exist and set permissions
+RUN ls -l /usr/local/bin/wp-config-create.sh /usr/local/bin/wp-install.sh && \
+    chmod +x /usr/local/bin/wp-config-create.sh /usr/local/bin/wp-install.sh
 
+# Run setup and PHP-FPM at runtime
 CMD ["sh", "-c", "/usr/local/bin/wp-config-create.sh && chmod -R 0777 /var/www/wp-content && /usr/local/bin/wp-install.sh"]
