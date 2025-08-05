@@ -1,9 +1,7 @@
 #!/bin/sh
 
-# CHANGE: Read db_password from Docker secret
 DB_PASS=$(cat /run/secrets/db_password)
 
-# CHANGE: Write to /var/www/wp-config.php to match WORKDIR /var/www
 cat > /var/www/wp-config.php << EOF
 <?php
 define('DB_NAME', '${DB_NAME}');
@@ -33,5 +31,4 @@ if ( ! defined('ABSPATH') )
 require_once ABSPATH . 'wp-settings.php';
 EOF
 
-# Set permissions
 chmod 644 /var/www/wp-config.php

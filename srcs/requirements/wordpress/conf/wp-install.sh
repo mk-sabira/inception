@@ -1,12 +1,10 @@
 #!/bin/sh
 
-# Read credentials from secrets
 WP_ADMIN_USER=$(head -n 1 /run/secrets/credentials)
 WP_ADMIN_PASS=$(sed -n 2p /run/secrets/credentials)
 WP_ADMIN_EMAIL=$(sed -n 3p /run/secrets/credentials)
 DB_PASS=$(cat /run/secrets/db_password)
 
-# Debug output (optional)
 echo "DB_USER=${DB_USER}, DOMAIN_NAME=${DOMAIN_NAME}"
 
 # Wait for MariaDB
@@ -26,7 +24,15 @@ if ! wp core is-installed --path=/var/www --allow-root; then
     --admin_email="${WP_ADMIN_EMAIL}" \
     --skip-email \
     --allow-root
+
+    # Create second user only if it does not exist
+  if ! wp user get seconduser --allow-root --path=/var/www > /dev/null 2>&1; then
+    wp user create seconduser seconduser@example.com \
+      --role=contributor \
+      --user_pass=secondpass \
+      --allow-root \
+      --path=/var/www
+  fi
 fi
 
-# CHANGE: Use php-fpm82 instead of php82-fpm to match Alpine 3.21 binary
 exec php-fpm82 --nodaemonize

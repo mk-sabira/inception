@@ -86,7 +86,6 @@ networks:
     driver: bridge
 
 secrets:
-  # CHANGE: Corrected paths from ./secrets/ to ../secrets/ to point to ~/incept/secrets/
   db_root_password:
     file: ../secrets/db_root_password.txt
   db_password:
